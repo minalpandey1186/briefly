@@ -85,13 +85,13 @@ export function parseWhatsApp(raw: string): ParseResult {
   }
   flush();
 
-  const participants = Array.from(
-    new Set(messages.map(m => m.sender).filter((s): s is string => s !== null && !m_isSystem(messages, s)))
-  );
-
-  function m_isSystem(msgs: ParsedMessage[], sender: string): boolean {
-    return msgs.some(m => m.sender === sender && m.isSystem);
+  const participantsSet = new Set<string>();
+  for (const m of messages) {
+    if (!m.isSystem && m.sender !== null) {
+      participantsSet.add(m.sender);
+    }
   }
+  const participants = Array.from(participantsSet);
 
   const timestamps = messages.map(m => m.timestamp).filter((t): t is Date => t !== null);
   const dateRange = {
